@@ -30,13 +30,19 @@ class App extends Component {
   mapChange = e => {
 
     let file = e.target.files[0];
+
+    // console.log(file['name'])
+    // TODO: check the type of file.
+    // If it is not json file, convert it into json format
+    // file['name'] contain the name of file. We should check it's subfix
     let fileReader = new FileReader();
     fileReader.readAsText(file);
 
     fileReader.onload = () => {
+
+      // Maiking text into Json object
       let result = JSON.parse(JSON.parse(JSON.stringify(fileReader.result)))
-      // console.log(typeof(result));
-      // console.log(result['type']);
+     
       this.setState({ selectedMapFile: result })
 
     };
@@ -58,8 +64,7 @@ class App extends Component {
             onChange={this.mapChange}
             style={{ display: "none" }} 
             accept='.json' />
-          {/* For Test */}
-          {/* <h4>Current Source: {selectedMapFile}</h4> */}
+
           
         </div>
 
@@ -74,6 +79,7 @@ class App extends Component {
             mapStyle="mapbox://styles/mapbox/outdoors-v11"
             mapboxAccessToken={MAPBOX_TOKEN}
           >
+            {/* TODO: Adding text Label on it */}
             <Source
               id="oregonjson"
               type="geojson"
