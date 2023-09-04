@@ -26,7 +26,7 @@ export default App; */
 
 import React, { Component } from "react";
 import ReactMapboxGL, { Source, Layer } from "react-map-gl";
-import './App.css'
+import "./App.css";
 
 class App extends Component {
   state = {
@@ -42,7 +42,11 @@ class App extends Component {
     return (
       <div className="Mapbox">
         <ReactMapboxGL
-          {...this.state.viewport}
+          initialViewState={{
+            longitude: -122.4,
+            latitude: 37.8,
+            zoom: 14,
+          }}
           onViewportChange={(viewport) => this.setState({ viewport })}
           mapStyle="mapbox://styles/mapbox/outdoors-v11"
           /* mapboxApiAccessToken="pk.eyJ1IjoieXVuYWhraW0iLCJhIjoiY2xtNTgybXd2MHdtMjNybnh6bXYweGNweiJ9.cfBakJXxub4ejba076E2Cw" */
