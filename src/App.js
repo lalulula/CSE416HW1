@@ -40,7 +40,7 @@ class App extends Component {
 
     fileReader.onload = () => {
 
-      // Maiking text into Json object
+      // Making text into Json object
       let result = JSON.parse(JSON.parse(JSON.stringify(fileReader.result)))
      
       this.setState({ selectedMapFile: result })
@@ -49,7 +49,7 @@ class App extends Component {
     
   };
 
-  
+ 
   render() {
     const {viewport, selectedMapFile} = this.state;
     return (
@@ -63,7 +63,7 @@ class App extends Component {
             ref={this.fileInput}
             onChange={this.mapChange}
             style={{ display: "none" }} 
-            accept='.json' />
+            accept='.json, .geojson' />
 
           
         </div>
@@ -81,16 +81,31 @@ class App extends Component {
           >
             {/* TODO: Adding text Label on it */}
             <Source
-              id="oregonjson"
+              id="geoSource"
               type="geojson"
+              generateId={true}
               data={selectedMapFile}
-            />
-            <Layer
-              id="anything"
-              type="fill"
-              source="oregonjson"
-              paint={{ "fill-color": "#228b22", "fill-opacity": 0.4 }}
-            />
+            >
+              <Layer
+                type="fill"
+                source="geoSource"
+                
+                paint={{ 
+                  "fill-color": "#228b22", 
+                  "fill-opacity": 0.4,
+                  "fill-outline-color": "#000000"
+                }}
+              />
+              <Layer
+                type="symbol"
+                source="geoSource"
+                layout={{
+                  "text-field": ['get', 'name']
+                  }}
+                
+              />
+              
+            </Source>
           </ReactMapboxGL>
         </div>
       </body>
