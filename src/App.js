@@ -118,7 +118,7 @@ function App() {
     height: "90vh",
     latitude: 44.065256,
     longitude: -125.075801,
-    zoom: 3,
+    zoom: 5,
   });
   const fileInput = useRef(null);
   const [selectedMapFile, setSelectedMapFile] = useState(DEFAULT_GEOJSON);
@@ -163,7 +163,8 @@ function App() {
             zoom: 3,
           }}
           onViewportChange={setViewport}
-          mapStyle="mapbox://styles/mapbox/outdoors-v11"
+          // mapStyle="mapbox://styles/mapbox/outdoors-v11"
+          mapStyle="mapbox://styles/mapbox/light-v11"
           mapboxAccessToken={MAPBOX_TOKEN}
         >
           {selectedMapFile && (
@@ -177,7 +178,7 @@ function App() {
                 type="fill"
                 source="geoSource"
                 paint={{
-                  "fill-color": "#228b22",
+                  "fill-color": "#0080ff",
                   "fill-opacity": 0.4,
                   "fill-outline-color": "#000000",
                 }}
@@ -187,6 +188,15 @@ function App() {
                 source="geoSource"
                 layout={{
                   "text-field": ["get", "name"],
+                }}
+              />
+              <Layer
+                id="outline"
+                type="line"
+                source="geoSource"
+                paint={{
+                  "line-color": "#000",
+                  "line-width": 3,
                 }}
               />
             </Source>
