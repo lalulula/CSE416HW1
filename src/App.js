@@ -163,8 +163,10 @@ function App() {
             zoom: 3,
           }}
           onViewportChange={setViewport}
-          // mapStyle="mapbox://styles/mapbox/outdoors-v11"
-          mapStyle="mapbox://styles/mapbox/light-v11"
+          // This one is more like a plain view
+          mapStyle="mapbox://styles/mapbox/outdoors-v11"
+          //This is a round view - I just wanted to try things so I added it and wanted you guys to take a look at it
+          // mapStyle="mapbox://styles/mapbox/light-v11"
           mapboxAccessToken={MAPBOX_TOKEN}
         >
           {selectedMapFile && (
