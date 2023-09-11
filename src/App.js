@@ -130,13 +130,36 @@ function App() {
     let file = e.target.files[0];
     let fileReader = new FileReader();
     setFileName(file["name"]);
+    
     // console.log(file["name"].replace(/\.geojson$/, ""));
     fileReader.readAsText(file);
     fileReader.onload = () => {
-      let uploadedFile = JSON.parse(
-        JSON.parse(JSON.stringify(fileReader.result))
-      );
+
+      let texts = fileReader.result;
+
+      // uploadedFile -> type: json object
+      let uploadedFile;
+
+      if(file["name"].endsWith('json')){
+        uploadedFile = JSON.parse(
+          JSON.parse(JSON.stringify(texts))
+        );
+      }
+      else if(file["name"].endsWith('kml')){
+        var tj = require('./togeojson');
+        var kml = new DOMParser().parseFromString(texts.toString(), "text/xml")
+        uploadedFile = JSON.parse(
+          JSON.stringify(tj.kml(kml), null, 4)
+        );
+      }
+      else if(file["name"].endsWith('shp')){
+        // TODO: adding shp to json 
+        
+      }
+      
+      
       setSelectedMapFile(uploadedFile);
+
     };
   };
 
@@ -151,7 +174,7 @@ function App() {
           ref={fileInput}
           onChange={handleMapChange}
           style={{ display: "none" }}
-          accept=".json, .geojson"
+          accept=".json, .geojson, .kml, .shp"
         />
       </div>
 
@@ -207,6 +230,7 @@ function App() {
       </div>
     </>
   );
+  
 }
 
 export default App;
