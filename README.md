@@ -7,6 +7,10 @@ All the needed test files are in the assets/ directory.
 
 In the project directory, you can run:
 
+### `npm i`
+
+run `npm install` or `npm i` to install all the dependancies
+
 ### `npm start`
 
 Runs the app in the development mode.\
