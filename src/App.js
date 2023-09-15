@@ -25,6 +25,7 @@ function App() {
   };
 
   const handleMapChange = async (e) => {
+    try{
       const file = e.target.files[0];
       setFileName(file.name);
 
@@ -40,42 +41,49 @@ function App() {
         var kml = new DOMParser().parseFromString(texts, "text/xml");
         uploadedFile = JSON.parse(JSON.stringify(tj.kml(kml), null, 4));
       } else if (file.name.endsWith(".zip")) {
-        JSZip.loadAsync(file).then(
-          function ( zip ) 
-          {
-            var shpString = "";
-            var dbfString = "";
-            for (var i = 0; i < Object.keys(zip["files"]).length; i++) {
-              // console.log(Object.keys(zip["files"])[i]);
-              if (Object.keys(zip["files"])[i].endsWith(".shp")){
-                shpString = Object.keys(zip["files"])[i];
-              }
-              else if(Object.keys(zip["files"])[i].endsWith(".dbf")){
-                dbfString = Object.keys(zip["files"])[i];
-              }
-            } 
-            
-            // I want to convert it into arraybuffer. 
-            const shpBuffer = zip["files"][shpString];
-            const dbfBuffer = zip["files"][dbfString];
-
-            
-            console.log(shpBuffer);
-            console.log(dbfBuffer);
-
-            const geojson = shapefile.read(shpBuffer, dbfBuffer);
-            uploadedFile = geojson;
-            console.log(uploadedFile);
+        try {
+          const zip = new JSZip();
+          const zipContents = await zip.loadAsync(file); // Load the ZIP file asynchronously
+          // Find the .shp and .dbf files in the ZIP archive
+          let shpBuffer, dbfBuffer;
+          for (const fileName in zipContents.files) {
+            if (fileName.endsWith(".shp")) {
+              shpBuffer = await zipContents.files[fileName].async("arraybuffer");
+            } else if (fileName.endsWith(".dbf")) {
+              dbfBuffer = await zipContents.files[fileName].async("arraybuffer");
+            }
           }
-        );
-  
-       
-        
-      }
+          // Process shpBuffer and dbfBuffer here
+          // You can use a library like 'shapefile' to read the contents
 
+          const geojson = await shapefile.read(shpBuffer, dbfBuffer);
+          // console.log(geojson.features[0]);
+          for (const data in geojson.features) {
+            var i = 0;
+            var name = "NAME_"
+            for(i = 0; i < 10; i++){
+              if(geojson.features[data].properties[name + i] === undefined){
+                i--;
+                break;
+              }
+            }
+            
+            geojson.features[data].properties.name = geojson.features[data].properties[name+i];
+          }
+          
+
+          uploadedFile = geojson;
+        } catch (error) {
+          // Handle any errors that may occur during file processing
+          console.error("Error processing the ZIP file:", error);
+        }
+      }
       setSelectedMapFile(uploadedFile);
     
- 
+    }
+    catch (error){
+      setSelectedMapFile(DEFAULT_GEOJSON);
+    }
   };
   return (
     <>
