@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from "react";
 import ReactMapboxGL, { Source, Layer } from "react-map-gl";
 import * as shapefile from "shapefile"; // Import the shapefile library
 import "./App.css";
+import JSZip from "jszip";
 
 const MAPBOX_TOKEN =
   "pk.eyJ1IjoieXVuYWhraW0iLCJhIjoiY2xtNTgybXd2MHdtMjNybnh6bXYweGNweiJ9.cfBakJXxub4ejba076E2Cw";
@@ -24,27 +25,57 @@ function App() {
   };
 
   const handleMapChange = async (e) => {
-    const file = e.target.files[0];
-    setFileName(file.name);
+      const file = e.target.files[0];
+      setFileName(file.name);
 
-    const texts = await file.text();
+      const texts = await file.text();
 
-    // uploadedFile -> type: json object
-    let uploadedFile;
+      // uploadedFile -> type: json object
+      let uploadedFile;
 
-    if (file.name.endsWith(".json") || file.name.endsWith(".geojson")) {
-      uploadedFile = JSON.parse(texts);
-    } else if (file.name.endsWith(".kml")) {
-      var tj = require("./togeojson");
-      var kml = new DOMParser().parseFromString(texts, "text/xml");
-      uploadedFile = JSON.parse(JSON.stringify(tj.kml(kml), null, 4));
-    } else if (file.name.endsWith(".shp")) {
-      const shpBuffer = await file.arrayBuffer();
-      const geojson = await shapefile.read(shpBuffer);
-      uploadedFile = geojson;
-    }
+      if (file.name.endsWith(".json") || file.name.endsWith(".geojson")) {
+        uploadedFile = JSON.parse(texts);
+      } else if (file.name.endsWith(".kml")) {
+        var tj = require("./togeojson");
+        var kml = new DOMParser().parseFromString(texts, "text/xml");
+        uploadedFile = JSON.parse(JSON.stringify(tj.kml(kml), null, 4));
+      } else if (file.name.endsWith(".zip")) {
+        JSZip.loadAsync(file).then(
+          function ( zip ) 
+          {
+            var shpString = "";
+            var dbfString = "";
+            for (var i = 0; i < Object.keys(zip["files"]).length; i++) {
+              // console.log(Object.keys(zip["files"])[i]);
+              if (Object.keys(zip["files"])[i].endsWith(".shp")){
+                shpString = Object.keys(zip["files"])[i];
+              }
+              else if(Object.keys(zip["files"])[i].endsWith(".dbf")){
+                dbfString = Object.keys(zip["files"])[i];
+              }
+            } 
+            
+            // I want to convert it into arraybuffer. 
+            const shpBuffer = zip["files"][shpString];
+            const dbfBuffer = zip["files"][dbfString];
 
-    setSelectedMapFile(uploadedFile);
+            
+            console.log(shpBuffer);
+            console.log(dbfBuffer);
+
+            const geojson = shapefile.read(shpBuffer, dbfBuffer);
+            uploadedFile = geojson;
+            console.log(uploadedFile);
+          }
+        );
+  
+       
+        
+      }
+
+      setSelectedMapFile(uploadedFile);
+    
+ 
   };
   return (
     <>
@@ -57,7 +88,7 @@ function App() {
           ref={fileInput}
           onChange={handleMapChange}
           style={{ display: "none" }}
-          accept=".json, .geojson, .kml, .shp"
+          accept=".json, .geojson, .kml, .zip"
         />
       </div>
 
