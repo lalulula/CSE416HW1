@@ -18,7 +18,7 @@ function App() {
     zoom: 5,
   });
   const fileInput = useRef(null);
-  const [selectedMapFile, setSelectedMapFile] = useState(DEFAULT_GEOJSON);
+  const [selectedMapFile, setSelectedMapFile] = useState("");
   const [fileName, setFileName] = useState("init.geojson");
   const handleLoadMap = () => {
     fileInput.current.click();
@@ -83,6 +83,7 @@ function App() {
     }
     catch (error){
       setSelectedMapFile(DEFAULT_GEOJSON);
+      console.log(error)
     }
   };
   return (
